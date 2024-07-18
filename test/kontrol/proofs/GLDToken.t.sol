@@ -87,7 +87,7 @@ contract GLDTokenTest is Test, KontrolCheats {
        ∀ value, ∀ account, account != 0, we expect the mint function to modify the following storage slots:
         - totalSupply - slot 2, 
         - sumOfAllBalances - slot 5,
-        - balances[account] - slot keccak256(abi.encode(account, bytes32(0)))
+        - _balances[account] - slot keccak256(abi.encode(account, bytes32(0)))
       The execution then splits on two branches, on the condition that totalSupply + value <= pow256 - 1.
       On one branch, we expect the function to go through, and update the fields accordingly.
       On the other branch, we expect the function to revert.
@@ -117,6 +117,10 @@ contract GLDTokenTest is Test, KontrolCheats {
         }
     }
 
+    /* The testBurn proof is similar to the previous one. One difference is in the structure of the proof.
+    The cases in which the account is/ is not equal to address(0) are put together in the same proof.
+    The symbolic execution will branch on the if statements, exploring both cases.
+    */
     function testBurn(address account, uint256 value) public totalSupplyIsSumOfAllBalances {
         kevm.allowChangesToStorage(address(gld), TOTAL_SUPPLY_STORAGE_INDEX);
         kevm.allowChangesToStorage(address(gld), SUMOFALLBALANCES_STORAGE_INDEX);
@@ -146,7 +150,11 @@ contract GLDTokenTest is Test, KontrolCheats {
         }
     }
 
-    //Invalid Sender
+    /* transfer proofs */
+
+    /* ∀ to, ∀ value, the transfer(to, value) will revert if the sender is address(0).
+    The storage remains unchaged.
+    */
     function testTransferFailure_0(address to, uint256 value, bytes32 storageSlot)
         public
         unchangedStorage(storageSlot)
@@ -156,7 +164,9 @@ contract GLDTokenTest is Test, KontrolCheats {
         gld.transfer(to, value);
     }
 
-    //Invalid Receiver
+    /* ∀ from, ∀ value, the transfer(address(0), value) will revert for any msg.sender `from`.
+    The storage remains unchanged.
+    */
     function testTransferFailure_1(address from, uint256 value, bytes32 storageSlot)
         public
         unchangedStorage(storageSlot)
@@ -168,7 +178,10 @@ contract GLDTokenTest is Test, KontrolCheats {
         gld.transfer(address(0), value);
     }
 
-    //Invalid Balance Failing
+    /* ∀ alice, ∀ bob, ∀ amount, where alice != 0, bob != 0 and _balances[alice] < amount, the
+    transfer(bob, value) call will revert for any msg.sender `alice`.
+    The storage remains unchanged.
+    */
     function testTransferFailure_2(address alice, address bob, uint256 amount, bytes32 storageSlot)
         public
         unchangedStorage(storageSlot)
@@ -186,7 +199,10 @@ contract GLDTokenTest is Test, KontrolCheats {
         gld.transfer(bob, amount);
     }
 
-    // Transfer: sender == receiver
+    /* ∀ alice, ∀ amount, where alice != 0, and _balances[alice] >= amount, the
+    transfer(alice, value) call will succeed for any msg.sender `alice`.
+    The storage remains unchanged.
+    */
     function testTransferSuccess_0(address alice, uint256 amount, bytes32 storageSlot)
         public
         unchangedStorage(storageSlot)
@@ -202,7 +218,14 @@ contract GLDTokenTest is Test, KontrolCheats {
         assertTrue(status);
     }
 
-    // Transfer: sender != receiver
+    /* ∀ alice, ∀ amount, where alice != 0, and _balances[alice] >= amount, the
+    transfer(bob, value) call will succeed for any msg.sender `alice`.
+    The function will modify the following storage slots:
+        - _balances[alice] - slot keccak256(abi.encode(alice, bytes32(0))),
+        - _balances[bob] - slot keccak256(abi.encode(bob, bytes32(0)))
+    The function explores both cases in which the receiver balance could or could not overflow.
+    Finally, the totalSupplyIsSumOfAllBalances modifier is checked.
+    */
     function testTransferSuccess_1(address alice, address bob, uint256 amount) public totalSupplyIsSumOfAllBalances {
         _notBuiltinAddress(alice);
         _notBuiltinAddress(bob);
@@ -217,16 +240,24 @@ contract GLDTokenTest is Test, KontrolCheats {
         uint256 balanceBob = gld.balanceOf(bob);
         vm.assume(balanceAlice >= amount);
         vm.assume(balanceBob <= MAX_INT - amount);
-        vm.expectEmit(true, true, false, true);
-        emit IERC20.Transfer(alice, bob, amount);
-        vm.prank(alice);
-        bool status = gld.transfer(bob, amount);
-        assertTrue(status);
-        assertEq(gld.balanceOf(alice), balanceAlice - amount);
-        assertEq(gld.balanceOf(bob), balanceBob + amount);
+        if (balanceBob <= MAX_INT - amount) {
+            vm.expectEmit(true, true, false, true);
+            emit IERC20.Transfer(alice, bob, amount);
+            vm.prank(alice);
+            bool status = gld.transfer(bob, amount);
+            assertTrue(status);
+            assertEq(gld.balanceOf(alice), balanceAlice - amount);
+            assertEq(gld.balanceOf(bob), balanceBob + amount);
+        } else {
+            vm.expectRevert();
+            vm.prank(alice);
+            gld.transfer(bob, amount);
+        }
     }
 
-    // Invalid Approver
+    /* ∀ spender, ∀ value, the approve(spender, value) call will revert when the msg.sender is address(0).
+    The storage remains unchanged.
+    */
     function testApproveFailure_0(address spender, uint256 value, bytes32 storageSlot)
         public
         unchangedStorage(storageSlot)
@@ -236,7 +267,9 @@ contract GLDTokenTest is Test, KontrolCheats {
         gld.approve(spender, value);
     }
 
-    // Invalid Spender
+    /* ∀ owner, ∀ value, the approve(address(0), value) call will revert for any msg.sender `owner`.
+    The storage remains unchanged.
+    */
     function testApproveFailure_1(address owner, uint256 value, bytes32 storageSlot)
         public
         unchangedStorage(storageSlot)
@@ -248,6 +281,14 @@ contract GLDTokenTest is Test, KontrolCheats {
         gld.approve(address(0), value);
     }
 
+    /* ∀ owner, ∀ spender, ∀ amount, where owner != 0 and spender != 0, the approve(spender, value) call
+    succeed for any msg.sender `owner`.
+    The function will modify the following storage slots:
+        - _allowances[owner][spender] = slot keccak256(abi.encode(spender, keccak256(abi.encode(owner, bytes32(1)))))
+    The function explores both cases in which the receiver balance could or could not overflow.
+    Finally, the totalSupplyIsSumOfAllBalances modifier is checked, but this is not requires as the whitelist storage
+    guarantees that both the totalSupply and the _balances fields remain unchanged.
+    */
     function testApproveSuccess(address owner, address spender, uint256 value) public totalSupplyIsSumOfAllBalances {
         _notBuiltinAddress(owner);
         _notBuiltinAddress(spender);
@@ -263,7 +304,16 @@ contract GLDTokenTest is Test, KontrolCheats {
         assertEq(gld.allowance(owner, spender), value);
     }
 
-    // insufficient allowance
+    /* transferFrom proofs.
+       The transfer logic has already been detailed above. The following proofs only reason about the
+       allowance.
+    */
+
+    /* ∀ spender, ∀ owner, ∀ alice, ∀ amount, where alice, owner and spender != address(0),
+    the transferFrom(spender, alice, amount) call will revert for any msg.sender `owner` when
+    the currentAllowance = _allowances[owner][spender] is less than the amount to be sent.
+    The storage remains unchanged.
+    */
     function testTransferFromFailure(address spender, address owner, address alice, uint256 amount, bytes32 storageSlot)
         public
         unchangedStorage(storageSlot)
@@ -283,6 +333,17 @@ contract GLDTokenTest is Test, KontrolCheats {
         gld.transferFrom(owner, alice, amount);
     }
 
+    /* ∀ spender, ∀ owner, ∀ alice, ∀ amount, where alice, owner and spender != address(0),
+    the transferFrom(spender, alice, amount) call will succeed for any msg.sender `owner` when
+    the currentAllowance = _allowances[owner][spender] is higher than the amount to be sent and
+    when the initial balance of the owner _balances[owner] is higher than the amount to be sent.
+    The function will only modify the following storage locations:
+    - _balances[owner] - slot keccak256(abi.encode(owner, bytes32(0)))
+    - _balances[alice] - slot keccak256(abi.encode(owner, bytes32(0)))
+    - _allowances[owner][spender] - slot keccak256(abi.encode(spender, keccak256(abi.encode(owner, bytes32(1)))))
+    The function explores both cases in which the allowance is infinite and in which it isn't.
+    Finally, the totalSupplyIsSumOfAllBalances asserts that the invariant still holds.
+    */
     function testTransferFromSuccess(address spender, address owner, address alice, uint256 amount)
         public
         totalSupplyIsSumOfAllBalances
