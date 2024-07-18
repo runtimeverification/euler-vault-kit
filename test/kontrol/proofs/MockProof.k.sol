@@ -43,12 +43,12 @@ contract MockTest is Test, KontrolCheats {
         mock = new Mock();
     }
 
-    function test_mockCall() public {
+    function prove_mockCall() public {
         vm.mockCall(address(b), abi.encodeWithSelector(b.mockedFunction.selector), abi.encode(7));
         assertEq(a.externalFunction(), 7);
     }
 
-    function test_mockFunction() public {
+    function prove_mockFunction() public {
         kevm.mockFunction(address(b), address(mock), abi.encodeWithSelector(b.mockedFunction.selector));
         assertEq(a.externalFunction(), 7);
     }

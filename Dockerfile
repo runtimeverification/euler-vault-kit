@@ -8,7 +8,6 @@ USER user
 
 WORKDIR /home/user/workshop
 
-# TODO:
-# RUN ./run-kontrol.sh
+RUN ./run-kontrol.sh
 
 ENTRYPOINT ["/bin/bash"]
