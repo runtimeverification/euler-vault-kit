@@ -51,6 +51,12 @@ contract EVaultProof is InitState, Test {
         address msgSender = alice;
 
         assertFalse(evc.isControllerEnabled(account, address(eTST)));
+
+        // Enabling controller
+        vm.prank(msgSender);
+        evc.enableController(account, address(eTST));
+        assertTrue(evc.isControllerEnabled(account, address(eTST)));
+
         /*
         // enabling controller
         vm.expectEmit(true, true, false, true, address(evc));
