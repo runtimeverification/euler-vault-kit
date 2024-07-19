@@ -12,4 +12,4 @@ FOUNDRY_PROFILE=kontrol kontrol prove --mt prove_EVault_asset_doesNotRevert --in
 
 FOUNDRY_PROFILE=kontrol kontrol prove --mt prove_Allowance_ReturnsZero --mt prove_Approve_NotSupported --mt prove_addIgnoredForTotalSupply_onlyOwner -j3
 
-FOUNDRY_PROFILE=kontrol kontrol prove --mt GLDTokenTest
+FOUNDRY_PROFILE=kontrol kontrol prove --mt GLDTokenTest.test -j3

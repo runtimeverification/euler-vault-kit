@@ -1,4 +1,4 @@
-FROM runtimeverificationinc/kontrol:ubuntu-jammy-0.1.360
+FROM runtimeverificationinc/kontrol:ubuntu-jammy-0.1.361
 
 COPY . /home/user/workshop
 
