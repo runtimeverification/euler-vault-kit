@@ -9,3 +9,5 @@ forge fmt test/kontrol
 FOUNDRY_PROFILE=kontrol kontrol build
 
 FOUNDRY_PROFILE=kontrol kontrol prove --mt prove_EVault_asset_doesNotRevert --init-node-from-dump test/kontrol/init-state/InitState.json
+
+FOUNDRY_PROFILE=kontrol kontrol prove --mt prove_Allowance_ReturnsZero --mt prove_Approve_NotSupported --mt prove_addIgnoredForTotalSupply_onlyOwner -j3
