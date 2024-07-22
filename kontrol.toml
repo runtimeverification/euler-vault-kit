@@ -4,7 +4,7 @@ regen                      = false
 rekompile                  = false
 verbose                    = false
 debug                      = false
-require                    = 'lemmas.k'
+require                    = 'lemmas.md'
 module-import              = 'TestBase:KONTROL-LEMMAS'
 
 [prove.default]
