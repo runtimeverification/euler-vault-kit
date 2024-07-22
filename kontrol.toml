@@ -9,7 +9,7 @@ module-import              = 'TestBase:KONTROL-LEMMAS'
 
 [prove.default]
 foundry-project-root       = '.'
-verbose                    = true
+verbose                    = false
 debug                      = false
 max-depth                  = 25000
 reinit                     = false
