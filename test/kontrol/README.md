@@ -65,6 +65,7 @@ In this repository, you can find the following examples:
 #### 1. [Counter](./proofs/Counter.k.sol)
 
 Taken from the [Kontrol documentation](https://docs.runtimeverification.com/kontrol/guides/kontrol-example/property-verification-using-kontrol), `CounterTest` is a simple (but eloquent) example of how Kontrol can catch an issue missed by a fuzzer.
+Please note that, at the moment, this example is not available in the Docker container.
 
 For illustration purposes, we've modified the code of a `Counter` contact by adding a special case in which its `setNumber` function would not update the number value and will throw an error instead.
 This will happen if two input parameters have specific values: `uint256 newNumber` is `0xC0FFEE` and `bool inLuck` is `true`. In other words, a test such as 
