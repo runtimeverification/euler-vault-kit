@@ -150,7 +150,7 @@ fs_permissions = [{ access = "read-write", path = "./"}]
 kontrol load-state InitState test/kontrol/init-state/InitState.json --contract-names test/kontrol/init-state/AddressNames.json --output-dir test/kontrol/proofs/utils`.
 ```
 This will generate two Solidity contracts in the [proofs/utils](./proofs/utils) directory that can be used to load the state into Kontrol.
-- You can then load the state into Kontrol by implementing a proof contract that inherits the [proofs/utils/InitState.sol](./proofs/utils/InitState.sol) contract generated in the previous step:
+- You can then implement a proof contract that inherits [proofs/utils/InitState.sol](./proofs/utils/InitState.sol) generated in the previous step, to access the names of the deployed contracts:
 ```solidity
 import {InitState} from "./utils/InitState.sol";
 
@@ -158,7 +158,10 @@ contract EVaultProof is InitState {
     ...
 }
 ```
-as done in [EVaultProof](./proofs/EVaultProof.k.sol). You can then prove that the "`asset()` does not revert" property holds by running
+as done in [EVaultProof](./proofs/EVaultProof.k.sol).
+Note that the generated contract has a `recreateState` function to recreate the state updates recorded with Foundry. However, it is faster to add said state updates through the `kontrol prove` command as instructed below.
+
+You can then prove that the "`asset()` does not revert" property holds by running
 ```shell
 kontrol prove --mt prove_EVault_asset_doesNotRevert --init-node-from-dump test/kontrol/init-state/InitState.json
 ```
