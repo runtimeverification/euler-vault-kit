@@ -63,9 +63,9 @@ module KONTROL-LEMMAS
       [concrete(X), simplification]
 
 
-    // Lookup simplifications
+    // Single Key Lookup Simplification
     rule #lookup (M:Map [ K1 <- #lookup(M, K1)], K2) => #lookup (M, K2) [simplification]
-
+    // Multiple Key Lookup Simplification
     rule #lookup (M:Map [ K1 <- #lookup (M, K1)] [ K2 <- #lookup (M, K2)], K3) => #lookup (M, K3) [simplification]
 
     // Map simplifications
