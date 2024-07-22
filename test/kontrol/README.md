@@ -5,7 +5,7 @@ In this repo you'll find a series of examples showcasing some of the features of
 
 ## Getting Kontrol
 
-We recommend installing Kontrol via the K framework package manager, `kup`.
+We recommend installing Kontrol via the K framework package manager, `kup`. We also recommend using the latest version of Foundry.
 
 To get `kup` and install Kontrol:
 ```shell
@@ -97,8 +97,7 @@ In the output, you should see that the test has failed with the following model 
 ```
 The path condition tells us that the failure occurs when `x == 12648430` and `inLuck == 1`, where `12648430` is the decimal representation of `0xC0FFEE`, and `1` represents `true` for Boolean values.
 
-The model represents concrete assignments to symbolic variables (`x`, `inLuck`, globally accessible variables such as `msg.sender` (`CALLER_ID`) and `tx.origin` (`ORIGIN_ID`)) that lead to the failure.
-In this case, once again, the model tells us that the failure occurs when `x` is `12648430` and `inLuck` is `1`.
+The model represents concrete assignments to the symbolic variables `x` and `inLuck` that lead to the failure. It also concretizes globally accessible variables such as `msg.sender` (`CALLER_ID`) and `tx.origin` (`ORIGIN_ID`), although their values are not relevant for this example.
 
 #### 2. [OpenZeppelin ERC20](./proofs/GLDToken.t.sol)
 
@@ -131,7 +130,7 @@ kontrol prove --mt prove_Allowance_ReturnsZero --mt prove_Approve_NotSupported -
 `EVaultProof` showcases the external computation feature of Kontrol. Kontrol is both time and resource intensive, but here's a way of saving an arbitrary amount of time when executing a proof in Kontrol.
 This example instructs on how to offload the initial part of your proof computation to Foundry (which is blazing fast) and then incorporate it into a Kontrol proof.
 
-The way we achieve this is via the cheatcodes `vm.stopAndReturnStateDiff` or `vm.dumpState` (undocumented at the time of writing).
+The way we achieve this is via the cheatcodes `vm.stopAndReturnStateDiff` or `vm.dumpState`.
 Depending on the cheatcode used the approach is slightly different. However, in both cases we produce a JSON containing the state of the chain after executing some code, and load that state into Kontrol.
 In this example, we are using `vm.dumpState` since it's easier to work with. For complete instructions on how to include external computation with `vm.stopAndReturnStateDiff`, please see the [documentation](https://github.com/runtimeverification/kontrol/tree/master/docs/external-computation).
 
