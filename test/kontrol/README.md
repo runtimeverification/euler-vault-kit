@@ -97,7 +97,7 @@ In the output, you should see that the test has failed with the following model 
 ```
 The path condition tells us that the failure occurs when `x == 12648430` and `inLuck == 1`, where `12648430` is the decimal representation of `0xC0FFEE`, and `1` represents `true` for Boolean values.
 
-The model represents concrete assignments to symbolic variables---`x`, `inLuck`, globally accessible variables such as `msg.sender` (`CALLER_ID`) and `tx.origin` (`ORIGIN_ID`)---that lead to the failure.
+The model represents concrete assignments to symbolic variables (`x`, `inLuck`, globally accessible variables such as `msg.sender` (`CALLER_ID`) and `tx.origin` (`ORIGIN_ID`)) that lead to the failure.
 In this case, once again, the model tells us that the failure occurs when `x` is `12648430` and `inLuck` is `1`.
 
 #### 2. [OpenZeppelin ERC20](./proofs/GLDToken.t.sol)
@@ -110,7 +110,7 @@ To run these proofs, execute:
 kontrol prove --mt GLDTokenTest.test
 ```
 
-To make formal reasoning more efficient, these tests are using lemmas provided in the [lemmas.k](../../lemmas.k) file. For more information on lemmas, please refer to [our documentation](https://docs.runtimeverification.com/kontrol/guides/advancing-proofs).
+To make formal reasoning more efficient, these tests are using lemmas provided in the [lemmas.md](../../lemmas.md) file. For more information on lemmas, please refer to [our documentation](https://docs.runtimeverification.com/kontrol/guides/advancing-proofs).
 
 #### 3. [DToken](./proofs/DToken.k.sol) and [ESynth](./proofs/ESynthProof.k.sol)
 
