@@ -39,4 +39,11 @@ call_override = false
 depth = 50
 runs = 1000
 
+[profile.kontrol]
+src = "test/kontrol/proofs"
+test = "test/kontrol/proofs"
+out = "kout"
+ast = true
+extra_output = ["storageLayout", "abi", "evm.methodIdentifiers", "evm.deployedBytecode.object", "devdoc"]
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
