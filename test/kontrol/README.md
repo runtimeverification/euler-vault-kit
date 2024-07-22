@@ -1,4 +1,4 @@
-Euler Vault Kit Kontrol Tests
+# Euler Vault Kit Kontrol Tests
 -------------------------
 
 In this repo you'll find a series of examples showcasing some of the features of Kontrol, an open-source tool for formal verification of Solidity smart contracts. 
@@ -19,7 +19,7 @@ For more information you can visit the [`kup` repo](https://github.com/runtimeve
 
 We also provide a docker image with this repository cloned and all the commands already executed in case you want to walk through the instructions provided.
 
-To get the docker image and run a bash shell do
+To get the docker image and run a bash shell, please run:
 ```shell
 docker run -it ghcr.io/runtimeverification/kontrol/friday-workshop
 ```
@@ -29,7 +29,7 @@ Once you've entered the container, please run the following command to use a Fou
 export FOUNDRY_PROFILE=kontrol
 ```
 
-To see the list of proofs that have been generated for this project, run
+To see the list of proofs that have been generated for this project, run:
 ```shell
 kontrol list
 ```
@@ -56,7 +56,7 @@ A specific proof can be run by passing the `--mt` flag with the name of the proo
 ```shell
 kontrol prove --mt prove_Allowance_ReturnsZero
 ```
-This command will ensure that `DToken` contract's `allowance` function returns zero for _any_ two input addresses.
+This command will ensure that `DToken` contract's `allowance` function returns zero for _any_ input addresses.
 
 ### Examples
 
@@ -115,14 +115,14 @@ To make formal reasoning more efficient, these tests are using lemmas provided i
 
 These proofs exemplify how to verify properties of contracts present in the Euler codebase by adapting the existing Foundry tests to Kontrol.
 
-[ESynthProof.prove_addIgnoredForTotalSupply_onlyOwner](./proofs/ESynthProof.k.sol) helps verify that the `addIgnoredForTotalSupply` function of the `ESynth` contract can only be called by the owner of the contract for all symbolic inputs.
+[ESynthProof.prove_addIgnoredForTotalSupply_onlyOwner](./proofs/ESynthProof.k.sol#L29) helps verify that the `addIgnoredForTotalSupply` function of the `ESynth` contract can only be called by the owner of the contract for all symbolic inputs.
 
-[DTokenProof.prove_Allowance_ReturnsZero](./proofs/DTokenProof.k.sol) verifies that the `allowance` function of the `DToken` contract returns zero for all inputs and storage values (ensured by the use of `kevm.symbolicStorage(address(dToken))` cheatcode in `setUp()`).
-[DTokenProof.prove_Approve_NotSupported](./proofs/DTokenProof.k.sol) verifies that the `approve` function of the `DToken` contract always reverts with a specific (`Errors.E_NotSupported`) custom error.
+[DTokenProof.prove_Allowance_ReturnsZero](./proofs/DTokenProof.k.sol#L28) verifies that the `allowance` function of the `DToken` contract returns zero for all inputs and storage values (ensured by the use of `kevm.symbolicStorage(address(dToken))` cheatcode in `setUp()`).
+[DTokenProof.prove_Approve_NotSupported](./proofs/DTokenProof.k.sol#L41) verifies that the `approve` function of the `DToken` contract always reverts with a specific (`Errors.E_NotSupported`) custom error.
 
 To run these three proofs in parallel, execute:
 ```shell
-FOUNDRY_PROFILE=kontrol kontrol prove --mt prove_Allowance_ReturnsZero --mt prove_Approve_NotSupported --mt prove_addIgnoredForTotalSupply_onlyOwner --workers 3
+kontrol prove --mt prove_Allowance_ReturnsZero --mt prove_Approve_NotSupported --mt prove_addIgnoredForTotalSupply_onlyOwner --workers 3
 ```
 
 #### 4. [EVault](./proofs/EVaultProof.k.sol)
@@ -150,7 +150,7 @@ fs_permissions = [{ access = "read-write", path = "./"}]
 kontrol load-state InitState test/kontrol/init-state/InitState.json --contract-names test/kontrol/init-state/AddressNames.json --output-dir test/kontrol/proofs/utils`.
 ```
 This will generate two Solidity contracts in the [proofs/utils](./proofs/utils) directory that can be used to load the state into Kontrol.
-- You can then load the state into Kontrol by implementing a proof contract that inherits the [./utils/InitState.sol](./utils/InitState.sol) contract generated in the previous step:
+- You can then load the state into Kontrol by implementing a proof contract that inherits the [proofs/utils/InitState.sol](./proofs/utils/InitState.sol) contract generated in the previous step:
 ```solidity
 import {InitState} from "./utils/InitState.sol";
 
@@ -160,7 +160,7 @@ contract EVaultProof is InitState {
 ```
 as done in [EVaultProof](./proofs/EVaultProof.k.sol). You can then prove that the "`asset()` does not revert" property holds by running
 ```shell
-FOUNDRY_PROFILE=kontrol kontrol prove --mt prove_EVault_asset_doesNotRevert --init-node-from-dump test/kontrol/init-state/InitState.json
+kontrol prove --mt prove_EVault_asset_doesNotRevert --init-node-from-dump test/kontrol/init-state/InitState.json
 ```
 
 #### 5. [MockProof](./proofs/MockProof.k.sol)
@@ -168,8 +168,8 @@ FOUNDRY_PROFILE=kontrol kontrol prove --mt prove_EVault_asset_doesNotRevert --in
 Another Kontrol feature that improves scalability is the ability to mock function calls. This is particularly useful when you want to test a contract that interacts with other contracts, but do not want to verify the whole logic of the external call being made.
 In this case, you can "summarize" the return values or side effects of the external call and use them in your proof by means of Foundry's `vm.mockCall(...)` cheatcode and Kontrol's `kevm.mockFunction(...)` cheatcode, respectively.
 
-- [MockTest.prove_mockCall](./proofs/MockProof.k.sol) demonstrates how `vm.mockCall` can be used to replace the actual external call with the specified return value.
-- [MockTest.prove_mockFunction](./proofs/MockProof.k.sol) demonstrates how `kevm.mockFunction` can substitute an external call to a smart contract function with a simpler implementation of this function available in a different, mock contract.
+- [MockTest.prove_mockCall](./proofs/MockProof.k.sol#L46) demonstrates how `vm.mockCall` can be used to replace the actual external call with the specified return value.
+- [MockTest.prove_mockFunction](./proofs/MockProof.k.sol#L51) demonstrates how `kevm.mockFunction` can substitute an external call to a smart contract function with a simpler implementation of this function available in a different, mock contract.
 
 ## Documentation, Socials and Posts
 
