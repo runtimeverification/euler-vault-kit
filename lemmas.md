@@ -26,6 +26,10 @@ module KONTROL-LEMMAS
 These lemmas ensure that concatenations and buffer operations within the [Bytes](https://github.com/runtimeverification/k/blob/master/k-distribution/include/kframework/builtin/domains.md#byte-arrays) sort follow consistent equality principles.
 
 ```k
+    //
+    // Equality of +Bytes
+    //
+
    // Equality of Concatenated Bytes (Direct)
    rule { B:Bytes #Equals B1:Bytes +Bytes B2:Bytes } =>
            { #range ( B, 0, lengthBytes(B1) ) #Equals B1 } #And
